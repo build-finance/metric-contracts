@@ -1,0 +1,31 @@
+{
+  "name": "metric-contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "clean": "hardhat clean && rimraf artifacts cache typechain",
+    "cleanse": "npm run clean && rimraf node_modules",
+    "compile": "hardhat compile",
+    "test": "cross-env HARDHAT_COMPILE=true HARDHAT_DEPLOY_FIXTURE=true REPORT_GAS=true hardhat test",
+    "coverage": "cross-env HARDHAT_DEPLOY_FIXTURE=true hardhat coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "chai": "^4.3.4",
+    "cross-env": "^7.0.3",
+    "dotenv": "^8.2.0",
+    "ethereum-waffle": "^3.3.0",
+    "ethers": "^5.1.4",
+    "hardhat": "^2.2.1",
+    "hardhat-gas-reporter": "^1.0.4",
+    "solidity-coverage": "^0.7.16"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.1.0"
+  }
+}
