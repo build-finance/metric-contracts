@@ -67,7 +67,7 @@ describe("MetricShare contract", function () {
 
             it("Should fail if no one has staked yet", async function() {
                 expect(MetricShare.connect(addr1).leave(100))
-                    .to.be.revertedWith("MetricShare: No METRIC is staked yet");
+                    .to.be.revertedWith("ERC20: burn amount exceeds balance");
             });
 
             it("Should fail if user provides an amount bigger than their xMETRIC balance", async function() {

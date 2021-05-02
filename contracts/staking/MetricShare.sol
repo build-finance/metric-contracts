@@ -51,7 +51,9 @@ contract MetricShare is ERC20("MetricShare", "xMETRIC"){
 
     function _underlying(uint256 _metricShareAmount) private view returns (uint256) {
         uint256 totalShares = totalSupply();
-        require(totalShares > 0, "MetricShare: No METRIC is staked yet");
+        if (totalShares == 0) {
+            return 0;
+        }
 
         uint256 totalStakedMetric = metric.balanceOf(address(this));
         return _metricShareAmount.mul(totalStakedMetric).div(totalShares);
