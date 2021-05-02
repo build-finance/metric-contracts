@@ -22,7 +22,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
  */
 
 contract MetricShare is ERC20("MetricShare", "xMETRIC"){
-    using SafeMath for uint256;
+
     IERC20 public metric;
 
     constructor(IERC20 _metric) {
@@ -46,7 +46,7 @@ contract MetricShare is ERC20("MetricShare", "xMETRIC"){
         }
 
         uint256 totalStakedMetric = metric.balanceOf(address(this));
-        return _metricAmount.mul(totalShares).div(totalStakedMetric);
+        return _metricAmount * totalShares / totalStakedMetric;
     }
 
     function _underlying(uint256 _metricShareAmount) private view returns (uint256) {
@@ -56,6 +56,6 @@ contract MetricShare is ERC20("MetricShare", "xMETRIC"){
         }
 
         uint256 totalStakedMetric = metric.balanceOf(address(this));
-        return _metricShareAmount.mul(totalStakedMetric).div(totalShares);
+        return _metricShareAmount * totalStakedMetric / totalShares;
     }
 }
