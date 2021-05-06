@@ -1,8 +1,11 @@
+abi
 artifacts
+typechain
 cache
 node_modules
 coverage
 coverage.json
+package-lock.json
 .idea
 .DS_Store
 .env

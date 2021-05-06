@@ -1,24 +1,33 @@
-const { expect } = require("chai");
+import { expect } from "chai";
+import { ethers } from 'hardhat';
+
+import {
+    MetricShare,
+    MetricShare__factory,
+    MetricToken,
+    MetricToken__factory
+} from "../typechain";
+import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 
 describe("MetricShare contract", function () {
 
-    let MetricTokenFactory;
-    let MetricToken;
+    let MetricTokenFactory: MetricToken__factory;
+    let MetricToken: MetricToken;
 
-    let MetricShareFactory;
-    let MetricShare;
+    let MetricShareFactory: MetricShare__factory;
+    let MetricShare: MetricShare;
 
-    let owner;
-    let addr1;
-    let addr2;
+    let owner: SignerWithAddress;
+    let addr1: SignerWithAddress;
+    let addr2: SignerWithAddress;
 
     beforeEach(async function () {
         [owner, addr1, addr2] = await ethers.getSigners();
 
-        MetricTokenFactory = await ethers.getContractFactory("MetricToken");
+        MetricTokenFactory = <MetricToken__factory>await ethers.getContractFactory("MetricToken");
         MetricToken = await MetricTokenFactory.deploy();
 
-        MetricShareFactory = await ethers.getContractFactory("MetricShare");
+        MetricShareFactory = <MetricShare__factory>await ethers.getContractFactory("MetricShare");
         MetricShare = await MetricShareFactory.deploy(MetricToken.address);
 
     });

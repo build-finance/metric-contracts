@@ -1,3 +1,5 @@
+import { ethers } from 'hardhat';
+
 async function main() {
 
     const [deployer] = await ethers.getSigners();
@@ -9,10 +11,10 @@ async function main() {
 
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
-    const Token = await ethers.getContractFactory("Token");
-    const token = await Token.deploy();
+    const MetricShare = await ethers.getContractFactory("MetricShare");
+    const metricShare = await MetricShare.deploy();
 
-    console.log("Token address:", token.address);
+    console.log("MetricShare address:", metricShare.address);
 }
 
 main()

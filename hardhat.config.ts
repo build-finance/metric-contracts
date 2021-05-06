@@ -1,10 +1,13 @@
-require("@nomiclabs/hardhat-waffle");
-require('hardhat-gas-reporter');
-require('solidity-coverage');
+import '@nomiclabs/hardhat-waffle';
+import '@nomiclabs/hardhat-ethers';
+import 'hardhat-deploy';
+import '@typechain/hardhat';
+import 'hardhat-gas-reporter';
+import 'solidity-coverage';
+import 'dotenv/config';
+import {HardhatUserConfig} from "hardhat/config";
 
-require("dotenv").config();
-
-module.exports = {
+const config: HardhatUserConfig = {
   solidity: "0.8.0",
   networks: {
     ropsten: {
@@ -19,3 +22,5 @@ module.exports = {
     showTimeSpent: true,
   },
 };
+
+export default config;
