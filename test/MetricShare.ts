@@ -35,6 +35,8 @@ describe("MetricShare contract", function () {
     describe("Deployment", function () {
         it("Should assign MetricToken as underlying asset for MetricShare", async function () {
             expect(await MetricShare.metric()).to.equal(MetricToken.address);
+            expect(await MetricShare.balance()).to.be.equal(0);
+            expect(await MetricShare.sharePrice()).to.be.equal("1000000000000000000");
         });
     });
 
@@ -61,7 +63,8 @@ describe("MetricShare contract", function () {
 
                 expect(MetricShare.connect(addr2).enter(100)).to.not.be.reverted;
                 expect(await MetricToken.balanceOf(addr2.address)).to.be.equal(0);
-
+                expect(await MetricShare.balance()).to.be.equal(100);
+                expect(await MetricShare.sharePrice()).to.be.equal("1000000000000000000");
             });
 
             it("Should mint xMETRIC to user on success", async function () {
@@ -135,6 +138,7 @@ describe("MetricShare contract", function () {
                 expect(await MetricToken.balanceOf(addr2.address)).to.be.equal(125);
                 expect(await MetricToken.balanceOf(addr1.address)).to.be.equal(125);
             });
+
         });
 
     });

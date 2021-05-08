@@ -20,12 +20,25 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  * underlying $METRIC
  */
 
-contract MetricShare is ERC20("MetricShare", "xMETRIC"){
+contract MetricShare is ERC20("MetricShare", "xMETRIC") {
 
     IERC20 public metric;
 
     constructor(IERC20 _metric) {
         metric = _metric;
+    }
+
+    function sharePrice() public view returns (uint256) {
+        uint256 stakedMetric = balance();
+        if (stakedMetric == 0) {
+            return 1e18;
+        }
+
+        return totalSupply() * 1e18 / stakedMetric;
+    }
+
+    function balance() public view returns (uint256) {
+        return metric.balanceOf(address(this));
     }
 
     function enter(uint256 _metricAmount) public {
