@@ -37,6 +37,20 @@ contract MetricLpShare is ERC20 {
         lpMetric = _lpMetric;
     }
 
+    function sharePrice() public view returns (uint256) {
+        uint256 availableReward = balance();
+        uint256 stakedLps = lpMetric.balanceOf(address(this));
+        if (stakedLps == 0) {
+            return 0;
+        }
+
+        return availableReward * 1e18 / stakedLps;
+    }
+
+    function balance() public view returns (uint256) {
+        return metric.balanceOf(address(this));
+    }
+
     function enter(uint256 _metricLpAmount) public {
         stakedMetricLpAmount[msg.sender] += _metricLpAmount;
         _mint(msg.sender, _shares(_metricLpAmount));
