@@ -3,41 +3,47 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IFeeCollector.sol";
 import "../libraries/Structures.sol";
+import "../libraries/Helpers.sol";
 import "./Controller.sol";
 
-contract FeeConverter is Ownable {
+contract FeeConverter {
 
     Controller controller;
 
     event FeeDistribution(address recipient, uint amount);
 
-    constructor(
-        Controller _controller
-    ) {
+    constructor(Controller _controller) {
         controller = _controller;
     }
 
     function convertTokens(
         address[] memory _tokens,
-        uint[] memory _supplyTokenAmounts,
+        uint[] memory _inputAmounts,
         uint[] memory _minOutputs
     ) public {
+
+        require(_tokens.length == _inputAmounts.length, "inputAmounts list length must match tokens list length");
+        require(_tokens.length == _minOutputs.length, "minOutputs list length must match tokens list length");
 
         _collectFees();
 
         uint expectedMinOutput = controller.rewardToken().balanceOf(address(this));
+        IBatchTokenSwapRouter router = controller.swapRouter();
 
         for (uint i = 0; i < _tokens.length; i++) {
-            IERC20(_tokens[i]).transfer(address(controller.swapRouter()), _supplyTokenAmounts[i]);
+            if (Helpers._isEth(_tokens[i])) {
+                payable(address(router)).transfer(_inputAmounts[i]);
+            } else {
+                IERC20(_tokens[i]).transfer(address(router), _inputAmounts[i]);
+            }
             expectedMinOutput += _minOutputs[i];
         }
 
         controller.swapRouter().batchSellTokens(
             _tokens,
-            _supplyTokenAmounts,
+            _inputAmounts,
             _minOutputs,
             address(controller.rewardToken())
         );
