@@ -29,7 +29,30 @@ contract FeeConverter {
 
         _collectFees();
 
-        uint expectedMinOutput = controller.rewardToken().balanceOf(address(this));
+        uint rewardTokenBalanceBeforeConversion = controller.rewardToken().balanceOf(address(this));
+
+        _executeConversion(_tokens, _inputAmounts, _minOutputs);
+
+        uint rewardTokenBalanceAfterConversion = controller.rewardToken().balanceOf(address(this));
+        uint convertedRewardTokenBalance = rewardTokenBalanceAfterConversion - rewardTokenBalanceBeforeConversion;
+        uint callerIncentive = convertedRewardTokenBalance * controller.feeConversionIncentive() / 100e18;
+
+        _sendRewardToken(msg.sender, callerIncentive);
+        _transferRewardTokenToReceivers(rewardTokenBalanceAfterConversion - callerIncentive);
+    }
+
+    function _collectFees() private {
+        IFeeCollector[] memory collectors = controller.getFeeCollectors();
+        for(uint i = 0; i < collectors.length; i++) {
+            collectors[i].collect();
+        }
+    }
+
+    function _executeConversion(
+        address[] memory _tokens,
+        uint[] memory _inputAmounts,
+        uint[] memory _minOutputs
+    ) private {
         IBatchTokenSwapRouter router = controller.swapRouter();
 
         for (uint i = 0; i < _tokens.length; i++) {
@@ -38,7 +61,6 @@ contract FeeConverter {
             } else {
                 IERC20(_tokens[i]).transfer(address(router), _inputAmounts[i]);
             }
-            expectedMinOutput += _minOutputs[i];
         }
 
         controller.swapRouter().batchSellTokens(
@@ -47,25 +69,6 @@ contract FeeConverter {
             _minOutputs,
             address(controller.rewardToken())
         );
-
-        uint rewardTokenBalance = controller.rewardToken().balanceOf(address(this));
-
-        require(
-            rewardTokenBalance >= expectedMinOutput,
-            "Insufficient output swap amount"
-        );
-
-        uint callerIncentive = rewardTokenBalance * controller.feeConversionIncentive() / 100e18;
-
-        _sendRewardToken(msg.sender, callerIncentive);
-        _transferRewardTokenToReceivers(rewardTokenBalance - callerIncentive);
-    }
-
-    function _collectFees() private {
-        IFeeCollector[] memory collectors = controller.getFeeCollectors();
-        for(uint i = 0; i < collectors.length; i++) {
-            collectors[i].collect();
-        }
     }
 
     function _transferRewardTokenToReceivers(uint _amount) private {
