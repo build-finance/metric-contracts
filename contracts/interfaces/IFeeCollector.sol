@@ -4,6 +4,6 @@ pragma solidity ^0.8.0;
 
 interface IFeeCollector {
 
-    function collect() external;
+    function collect(bytes memory _parameters) external;
 
 }

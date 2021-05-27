@@ -11,7 +11,7 @@
     "coverage": "cross-env HARDHAT_DEPLOY_FIXTURE=true hardhat coverage"
   },
   "keywords": [],
-  "author": "",
+  "author": "https://github.com/SHA-2048",
   "license": "ISC",
   "devDependencies": {
     "@ethersproject/bignumber": "^5.0.14",

@@ -21,13 +21,14 @@ contract FeeConverter {
     function convertTokens(
         address[] memory _tokens,
         uint[] memory _inputAmounts,
-        uint[] memory _minOutputs
+        uint[] memory _minOutputs,
+        bytes[] memory _feeCollectorParameters
     ) public {
 
         require(_tokens.length == _inputAmounts.length, "inputAmounts list length must match tokens list length");
         require(_tokens.length == _minOutputs.length, "minOutputs list length must match tokens list length");
 
-        _collectFees();
+        _collectFees(_feeCollectorParameters);
 
         uint rewardTokenBalanceBeforeConversion = controller.rewardToken().balanceOf(address(this));
 
@@ -41,10 +42,13 @@ contract FeeConverter {
         _transferRewardTokenToReceivers(rewardTokenBalanceAfterConversion - callerIncentive);
     }
 
-    function _collectFees() private {
+    function _collectFees(bytes[] memory _feeCollectorParameters) private {
         IFeeCollector[] memory collectors = controller.getFeeCollectors();
+
+        require(collectors.length == _feeCollectorParameters.length, "Must provide parameters to all known collectors");
+
         for(uint i = 0; i < collectors.length; i++) {
-            collectors[i].collect();
+            collectors[i].collect(_feeCollectorParameters[i]);
         }
     }
 
