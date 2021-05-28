@@ -6,7 +6,7 @@ import {
     MetricShare__factory,
     MetricToken,
     MetricToken__factory
-} from "../typechain";
+} from "../../typechain";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 
 describe("MetricShare contract", function () {

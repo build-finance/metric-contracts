@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { ethers } from 'hardhat';
 
-import {MetricLpShare, MetricLpShare__factory, MetricToken, MetricToken__factory} from "../typechain";
+import {MetricLpShare, MetricLpShare__factory, MetricToken, MetricToken__factory} from "../../typechain";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 
 describe("MetricLpShare contract", function () {
