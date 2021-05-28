@@ -9,4 +9,16 @@ library Structures {
         uint share;
     }
 
+    struct FeeCollectorCall {
+        bool call;
+        bytes parameters;
+    }
+
+    struct HidingGameClaimParameters {
+        address to;
+        uint earningsToDate;
+        uint nonce;
+        bytes signature;
+    }
+
 }

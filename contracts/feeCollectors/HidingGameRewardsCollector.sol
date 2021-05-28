@@ -2,15 +2,9 @@ pragma solidity ^0.8.0;
 
 import "../interfaces/IFeeCollector.sol";
 import "../interfaces/IHidingGameClaimContract.sol";
+import "../libraries/Structures.sol";
 
 contract HidingGameRewardsCollector is IFeeCollector {
-
-    struct HidingGameClaimParameters {
-        address to;
-        uint earningsToDate;
-        uint nonce;
-        bytes signature;
-    }
 
     IHidingGameClaimContract hidingGameClaimContract;
 
@@ -20,7 +14,8 @@ contract HidingGameRewardsCollector is IFeeCollector {
 
     function collect(bytes memory _parameters) override external {
 
-        HidingGameClaimParameters memory params = abi.decode(_parameters, (HidingGameClaimParameters));
+        Structures.HidingGameClaimParameters memory params =
+            abi.decode(_parameters, (Structures.HidingGameClaimParameters));
 
         hidingGameClaimContract.claim(
             params.to,

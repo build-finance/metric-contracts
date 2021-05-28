@@ -39,19 +39,11 @@ contract Controller is Ownable, Pausable {
 
     }
 
-    function pause() public onlyOwner {
-        _pause();
-    }
-
-    function unpause() public onlyOwner {
-        _unpause();
-    }
-
-    function getRewardReceivers() public view whenNotPaused returns(Structures.RewardReceiver[] memory){
+    function getRewardReceivers() public view returns(Structures.RewardReceiver[] memory){
         return rewardReceivers;
     }
 
-    function getFeeCollectors() public view whenNotPaused returns(IFeeCollector[] memory) {
+    function getFeeCollectors() public view returns(IFeeCollector[] memory) {
         return feeCollectors;
     }
 
@@ -81,6 +73,14 @@ contract Controller is Ownable, Pausable {
 
     function setRewardToken(IERC20 _token) onlyOwner public {
         rewardToken = _token;
+    }
+
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    function unpause() public onlyOwner {
+        _unpause();
     }
 
 }

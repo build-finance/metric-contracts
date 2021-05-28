@@ -6,14 +6,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IFeeCollector.sol";
 import "../libraries/Structures.sol";
 import "../libraries/Helpers.sol";
-import "./Controller.sol";
+import "../governance/Controller.sol";
+import "../libraries/Structures.sol";
 
 contract FeeConverter {
-
-    struct FeeCollectorCall {
-        bool call;
-        bytes parameters;
-    }
 
     Controller controller;
 
@@ -27,8 +23,8 @@ contract FeeConverter {
         address[] memory _tokens,
         uint[] memory _inputAmounts,
         uint[] memory _minOutputs,
-        FeeCollectorCall[] memory _feeCollectorParameters
-    ) public {
+        Structures.FeeCollectorCall[] memory _feeCollectorParameters
+    ) public whenNotPaused {
 
         require(_tokens.length == _inputAmounts.length, "inputAmounts list length must match tokens list length");
         require(_tokens.length == _minOutputs.length, "minOutputs list length must match tokens list length");
@@ -47,7 +43,7 @@ contract FeeConverter {
         _transferRewardTokenToReceivers(rewardTokenBalanceAfterConversion - callerIncentive);
     }
 
-    function _collectFees(FeeCollectorCall[] memory _feeCollectorParameters) private {
+    function _collectFees(Structures.FeeCollectorCall[] memory _feeCollectorParameters) private {
         IFeeCollector[] memory collectors = controller.getFeeCollectors();
 
         require(collectors.length == _feeCollectorParameters.length, "Must provide parameters to all known collectors");
@@ -101,6 +97,11 @@ contract FeeConverter {
     function _sendRewardToken(address _recipient, uint _amount) private {
         controller.rewardToken().transfer(_recipient, _amount);
         emit FeeDistribution(_recipient, _amount);
+    }
+
+    modifier whenNotPaused() {
+        require(!controller.paused(), "Forbidden: System is paused");
+        _;
     }
 
 }
