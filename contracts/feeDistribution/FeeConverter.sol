@@ -10,6 +10,11 @@ import "./Controller.sol";
 
 contract FeeConverter {
 
+    struct FeeCollectorCall {
+        bool call;
+        bytes parameters;
+    }
+
     Controller controller;
 
     event FeeDistribution(address recipient, uint amount);
@@ -22,7 +27,7 @@ contract FeeConverter {
         address[] memory _tokens,
         uint[] memory _inputAmounts,
         uint[] memory _minOutputs,
-        bytes[] memory _feeCollectorParameters
+        FeeCollectorCall[] memory _feeCollectorParameters
     ) public {
 
         require(_tokens.length == _inputAmounts.length, "inputAmounts list length must match tokens list length");
@@ -42,13 +47,15 @@ contract FeeConverter {
         _transferRewardTokenToReceivers(rewardTokenBalanceAfterConversion - callerIncentive);
     }
 
-    function _collectFees(bytes[] memory _feeCollectorParameters) private {
+    function _collectFees(FeeCollectorCall[] memory _feeCollectorParameters) private {
         IFeeCollector[] memory collectors = controller.getFeeCollectors();
 
         require(collectors.length == _feeCollectorParameters.length, "Must provide parameters to all known collectors");
 
         for(uint i = 0; i < collectors.length; i++) {
-            collectors[i].collect(_feeCollectorParameters[i]);
+            if (_feeCollectorParameters[i].call) {
+                collectors[i].collect(_feeCollectorParameters[i].parameters);
+            }
         }
     }
 
