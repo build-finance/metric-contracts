@@ -10,9 +10,11 @@ import {HardhatUserConfig} from "hardhat/config";
 const config: HardhatUserConfig = {
   solidity: "0.8.0",
   networks: {
-    ropsten: {
-      url: `https://eth-ropsten.alchemyapi.io/v2/${process.env.ALCHEMY_ROPSTEN_API_KEY}`,
-      accounts: [`0x${process.env.ROPSTEN_ACCOUNT_PRIVATE_KEY}`]
+    hardhat: {
+      forking: {
+        url: `https://eth-ropsten.alchemyapi.io/v2/${process.env.ALCHEMY_MAINNET_API_KEY}`,
+        blockNumber: 10327147
+      }
     }
   },
   gasReporter: {
