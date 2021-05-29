@@ -37,50 +37,48 @@ contract UniswapV2BatchSwapRouter is IBatchTokenSwapRouter, Helpers {
 
                 require(msg.value == _supplyTokenAmounts[i], "ETH amount to convert does not match transaction value");
 
-                address[] memory path = new address[](2);
-                path[0] = uniswapRouter.WETH();
-                path[1] = _outputToken;
-
                 uniswapRouter.swapExactETHForTokens{ value: _supplyTokenAmounts[i] }(
                     _minOutputs[i],
-                    path,
+                    _path(_tokens[i], _outputToken),
                     address(msg.sender),
                     block.timestamp + 1000
                 );
-            } else if (_tokens[i] == uniswapRouter.WETH()) {
 
-                IERC20(_tokens[i]).transferFrom(msg.sender, address(this), _supplyTokenAmounts[i]);
-                IERC20(_tokens[i]).approve(address(uniswapRouter), MAX_INT);
-
-                address[] memory path = new address[](2);
-                path[0] = uniswapRouter.WETH();
-                path[1] = _outputToken;
-
-                uniswapRouter.swapExactTokensForTokens(
-                    _supplyTokenAmounts[i],
-                    _minOutputs[i],
-                    path,
-                    address(msg.sender),
-                    block.timestamp + 1000
-                );
             } else {
 
                 IERC20(_tokens[i]).transferFrom(msg.sender, address(this), _supplyTokenAmounts[i]);
                 IERC20(_tokens[i]).approve(address(uniswapRouter), MAX_INT);
 
-                address[] memory path = new address[](3);
-                path[0] = _tokens[i];
-                path[1] = uniswapRouter.WETH();
-                path[2] = _outputToken;
-
                 uniswapRouter.swapExactTokensForTokens(
                     _supplyTokenAmounts[i],
                     _minOutputs[i],
-                    path,
+                    _path(_tokens[i], _outputToken),
                     address(msg.sender),
                     block.timestamp + 1000
                 );
+
             }
+        }
+    }
+
+    function _path(address _token, address _outputToken) internal view returns (address[] memory) {
+
+        if (_isEth(_token) || _token == uniswapRouter.WETH()) {
+
+            address[] memory path = new address[](2);
+            path[0] = uniswapRouter.WETH();
+            path[1] = _outputToken;
+
+            return path;
+
+        } else {
+
+            address[] memory path = new address[](3);
+            path[0] = _token;
+            path[1] = uniswapRouter.WETH();
+            path[2] = _outputToken;
+
+            return path;
         }
     }
 
