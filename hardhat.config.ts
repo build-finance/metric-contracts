@@ -12,8 +12,8 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       forking: {
-        url: `https://eth-ropsten.alchemyapi.io/v2/${process.env.ALCHEMY_MAINNET_API_KEY}`,
-        blockNumber: 10327147
+        url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_MAINNET_API_KEY}`,
+        blockNumber: 12525440
       }
     }
   },
@@ -23,6 +23,9 @@ const config: HardhatUserConfig = {
     enabled: !!process.env.REPORT_GAS,
     showTimeSpent: true,
   },
+  mocha: {
+    timeout: 200000
+  }
 };
 
 export default config;

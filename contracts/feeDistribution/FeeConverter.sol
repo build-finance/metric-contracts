@@ -9,7 +9,7 @@ import "../libraries/Helpers.sol";
 import "../governance/Controller.sol";
 import "../libraries/Structures.sol";
 
-contract FeeConverter {
+contract FeeConverter is Helpers {
 
     Controller controller;
 
@@ -63,7 +63,7 @@ contract FeeConverter {
         IBatchTokenSwapRouter router = controller.swapRouter();
 
         for (uint i = 0; i < _tokens.length; i++) {
-            if (Helpers._isEth(_tokens[i])) {
+            if (_isEth(_tokens[i])) {
                 payable(address(router)).transfer(_inputAmounts[i]);
             } else {
                 IERC20(_tokens[i]).transfer(address(router), _inputAmounts[i]);

@@ -9,6 +9,6 @@ interface IBatchTokenSwapRouter {
         uint[] memory _supplyTokenAmounts,
         uint[] memory _minOutputs,
         address outputToken
-    ) external;
+    ) external payable;
 
 }
