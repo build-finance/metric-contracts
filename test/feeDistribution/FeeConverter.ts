@@ -40,14 +40,11 @@ describe("FeeConverter contract", function () {
 
     let owner: SignerWithAddress;
     let user: SignerWithAddress;
-    let collector1: SignerWithAddress;
-    let collector2: SignerWithAddress;
-    let router: SignerWithAddress;
     let metricFeeRecipient: SignerWithAddress;
 
     beforeEach(async function () {
 
-        [owner, user, collector1, collector2, router] =
+        [owner, user] =
             await ethers.getSigners();
 
         uniswapV2BatchSwapRouterFactory =
