@@ -49,7 +49,7 @@ contract Controller is Ownable, Pausable {
 
     function setRewardReceivers(
         Structures.RewardReceiver[] memory _rewardReceivers
-    ) onlyOwner public {
+    ) onlyOwner external {
         delete rewardReceivers;
 
         for(uint i = 0; i < _rewardReceivers.length; i++) {
@@ -59,7 +59,7 @@ contract Controller is Ownable, Pausable {
 
     function setFeeCollectors(
         IFeeCollector[] memory _feeCollectors
-    ) onlyOwner public {
+    ) onlyOwner external {
         delete feeCollectors;
 
         for(uint i = 0; i < _feeCollectors.length; i++) {
@@ -67,11 +67,11 @@ contract Controller is Ownable, Pausable {
         }
     }
 
-    function setFeeConversionIncentive(uint _value) onlyOwner public {
+    function setFeeConversionIncentive(uint _value) onlyOwner external {
         feeConversionIncentive = _value;
     }
 
-    function setRewardToken(IERC20 _token) onlyOwner public {
+    function setRewardToken(IERC20 _token) onlyOwner external {
         rewardToken = _token;
     }
 

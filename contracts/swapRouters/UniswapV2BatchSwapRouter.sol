@@ -47,7 +47,9 @@ contract UniswapV2BatchSwapRouter is IBatchTokenSwapRouter, Helpers {
             } else {
 
                 IERC20(_tokens[i]).transferFrom(msg.sender, address(this), _supplyTokenAmounts[i]);
-                IERC20(_tokens[i]).approve(address(uniswapRouter), MAX_INT);
+                if (IERC20(_tokens[i]).allowance(address(this), address(uniswapRouter)) < _supplyTokenAmounts[i]) {
+                    IERC20(_tokens[i]).approve(address(uniswapRouter), MAX_INT);
+                }
 
                 uniswapRouter.swapExactTokensForTokens(
                     _supplyTokenAmounts[i],

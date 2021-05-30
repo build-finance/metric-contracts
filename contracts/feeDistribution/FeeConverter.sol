@@ -11,7 +11,9 @@ import "../libraries/Structures.sol";
 
 contract FeeConverter is Helpers {
 
-    Controller controller;
+    uint MAX_INT = 2**256 - 1;
+
+    Controller public controller;
 
     event FeeDistribution(address recipient, uint amount);
 
@@ -24,7 +26,7 @@ contract FeeConverter is Helpers {
         uint[] memory _inputAmounts,
         uint[] memory _minOutputs,
         Structures.FeeCollectorCall[] memory _feeCollectorParameters
-    ) public whenNotPaused {
+    ) external whenNotPaused {
 
         require(_tokens.length == _inputAmounts.length, "inputAmounts list length must match tokens list length");
         require(_tokens.length == _minOutputs.length, "minOutputs list length must match tokens list length");
@@ -60,17 +62,18 @@ contract FeeConverter is Helpers {
         uint[] memory _inputAmounts,
         uint[] memory _minOutputs
     ) private {
+        uint ethToSend = 0;
         IBatchTokenSwapRouter router = controller.swapRouter();
 
         for (uint i = 0; i < _tokens.length; i++) {
             if (_isEth(_tokens[i])) {
-                payable(address(router)).transfer(_inputAmounts[i]);
-            } else {
-                IERC20(_tokens[i]).transfer(address(router), _inputAmounts[i]);
+                ethToSend += _inputAmounts[i];
+            } else if (IERC20(_tokens[i]).allowance(address(this), address(router)) < _inputAmounts[i]) {
+                IERC20(_tokens[i]).approve(address(router), MAX_INT);
             }
         }
 
-        controller.swapRouter().batchSellTokens(
+        controller.swapRouter().batchSellTokens{ value: ethToSend }(
             _tokens,
             _inputAmounts,
             _minOutputs,
@@ -103,5 +106,7 @@ contract FeeConverter is Helpers {
         require(!controller.paused(), "Forbidden: System is paused");
         _;
     }
+
+    receive() external payable {}
 
 }
