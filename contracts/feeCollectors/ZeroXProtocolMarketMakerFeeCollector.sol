@@ -17,9 +17,9 @@ contract ZeroXProtocolMarketMakerFeeCollector is IFeeCollector, Ownable {
 
     function collect(bytes memory _parameters) override external {
         uint wethBalance = weth.balanceOf(address(this));
-        if (wethBalance > 0) {
-            weth.transfer(feeRecipient, wethBalance);
-        }
+        weth.transfer(feeRecipient, wethBalance);
     }
+
+    // TODO implement pool operating functions
 
 }

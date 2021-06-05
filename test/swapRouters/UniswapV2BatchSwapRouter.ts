@@ -17,7 +17,7 @@ describe("UniswapV2BatchSwapRouter contract", function () {
     let METRIC_FEE_RECIPIENT_ADDRESS = "0x52427b0035f494a21a0a4a1abe04d679f789c821";
 
     let WETH_TOKEN = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-    let WETH_BALANCE = BigNumber.from("1405758459293434584");
+    let WETH_BALANCE = BigNumber.from("405758459293434584");
 
     let DPI_TOKEN = "0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b";
     let DPI_BALANCE = BigNumber.from("1763860847159779648");
