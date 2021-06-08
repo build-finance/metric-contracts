@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IFeeCollector.sol";
+import "../interfaces/IRevenueShareReceiver.sol";
 import "../libraries/Structures.sol";
 import "../libraries/Helpers.sol";
 import "../governance/Controller.sol";
@@ -90,11 +91,19 @@ contract FeeConverter is Helpers {
 
         for(uint i = 0; i < nbReceivers - 1; i++) {
             uint receiverShare = _amount * receivers[i].share / 100e18;
-            _sendRewardToken(receivers[i].receiver, receiverShare);
+            _sendReceiverShare(receivers[i], receiverShare);
 
             remaining -= receiverShare;
         }
-        _sendRewardToken(receivers[nbReceivers - 1].receiver, remaining);
+        _sendReceiverShare(receivers[nbReceivers - 1], remaining);
+    }
+
+    function _sendReceiverShare(Structures.RewardReceiver memory _recipient, uint _amount) private {
+        _sendRewardToken(_recipient.receiver, _amount);
+
+        if (_recipient.call == true) {
+            IRevenueShareReceiver(_recipient.receiver).processRevenue();
+        }
     }
 
     function _sendRewardToken(address _recipient, uint _amount) private {

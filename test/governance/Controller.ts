@@ -33,10 +33,12 @@ describe("Controller contract", function () {
             await controllerFactory.deploy(
                 [{
                     receiver: receiver1.address,
-                    share: 1000
+                    share: 1000,
+                    call: false
                 }, {
                     receiver: receiver2.address,
-                    share: 10000
+                    share: 10000,
+                    call: false
                 }],
                 [collector1.address, collector2.address],
                 router.address,
@@ -48,8 +50,8 @@ describe("Controller contract", function () {
     describe("Deployment", function () {
         it("Should correctly assign different controller attributes", async function () {
             expect(await controller.getRewardReceivers()).to.eql([
-                [ receiver1.address, BigNumber.from(1000) ],
-                [ receiver2.address, BigNumber.from(10000) ]
+                [ receiver1.address, BigNumber.from(1000), false ],
+                [ receiver2.address, BigNumber.from(10000), false ]
             ]);
             expect(await controller.getFeeCollectors()).to.eql([collector1.address, collector2.address]);
             expect(await controller.swapRouter()).to.eql(router.address);
@@ -63,9 +65,14 @@ describe("Controller contract", function () {
         it("setRewardReceivers should correctly override existing receivers list", async function () {
             await controller.setRewardReceivers([{
                 receiver: receiver2.address,
-                share: BigNumber.from(3000)
+                share: BigNumber.from(3000),
+                call: false
             }]);
-            expect(await controller.getRewardReceivers()).to.eql([[ receiver2.address, BigNumber.from(3000) ]]);
+            expect(await controller.getRewardReceivers()).to.eql([[
+                receiver2.address,
+                BigNumber.from(3000),
+                false
+            ]]);
         });
 
         it("setFeeCollectors should correctly override existing feeCollector list", async function () {
@@ -92,7 +99,8 @@ describe("Controller contract", function () {
                 .to.be.revertedWith("Ownable: caller is not the owner");
             expect(controller.connect(user).setRewardReceivers([{
                     receiver: receiver2.address,
-                    share: BigNumber.from(3000)
+                    share: BigNumber.from(3000),
+                    call: false
                 }]))
                 .to.be.revertedWith("Ownable: caller is not the owner");
         });

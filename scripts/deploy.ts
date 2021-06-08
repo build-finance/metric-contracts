@@ -42,7 +42,8 @@ async function main() {
     const controller = await Controller.deploy(
         [{
             receiver: metricShare.address,
-            share: ethers.utils.parseEther("100.0")
+            share: ethers.utils.parseEther("100.0"),
+            call: false
         }],
         [],
         uniswapBatchRouter.address,

@@ -71,10 +71,12 @@ describe("FeeConverter contract", function () {
             await controllerFactory.deploy(
                 [{
                     receiver: metricShare.address,
-                    share: BigNumber.from("40000000000000000000")
+                    share: BigNumber.from("40000000000000000000"),
+                    call: false
                 }, {
                     receiver: metricSharePool2.address,
-                    share: BigNumber.from("60000000000000000000")
+                    share: BigNumber.from("60000000000000000000"),
+                    call: false
                 }],
                 [],
                 uniswapV2BatchSwapRouter.address,

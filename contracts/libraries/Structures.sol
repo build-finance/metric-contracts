@@ -7,6 +7,7 @@ library Structures {
     struct RewardReceiver {
         address receiver;
         uint share;
+        bool call;
     }
 
     struct FeeCollectorCall {
