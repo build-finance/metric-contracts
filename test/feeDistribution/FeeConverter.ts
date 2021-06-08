@@ -8,10 +8,8 @@ import {
     FeeConverter,
     FeeConverter__factory,
     IERC20,
-    MetricLpShare,
-    MetricLpShare__factory,
-    MetricShare,
-    MetricShare__factory,
+    RevenueShare,
+    RevenueShare__factory,
     UniswapV2BatchSwapRouter,
     UniswapV2BatchSwapRouter__factory,
     ZeroXProtocolMarketMakerFeeCollector,
@@ -40,11 +38,9 @@ describe("FeeConverter contract", function () {
     let uniswapV2BatchSwapRouterFactory: UniswapV2BatchSwapRouter__factory;
     let uniswapV2BatchSwapRouter: UniswapV2BatchSwapRouter;
 
-    let metricShareFactory: MetricShare__factory;
-    let metricShare: MetricShare;
-
-    let metricLpShareFactory: MetricLpShare__factory;
-    let metricLpShare: MetricLpShare;
+    let metricShareFactory: RevenueShare__factory;
+    let metricShare: RevenueShare;
+    let metricSharePool2: RevenueShare;
 
     let zeroXFeeCollectorFactory: ZeroXProtocolMarketMakerFeeCollector__factory;
     let zeroXFeeCollector: ZeroXProtocolMarketMakerFeeCollector;
@@ -60,8 +56,7 @@ describe("FeeConverter contract", function () {
 
         uniswapV2BatchSwapRouterFactory =
             <UniswapV2BatchSwapRouter__factory>await ethers.getContractFactory("UniswapV2BatchSwapRouter");
-        metricShareFactory = <MetricShare__factory>await ethers.getContractFactory("MetricShare");
-        metricLpShareFactory = <MetricLpShare__factory>await ethers.getContractFactory("MetricLpShare");
+        metricShareFactory = <RevenueShare__factory>await ethers.getContractFactory("RevenueShare");
         controllerFactory = <Controller__factory>await ethers.getContractFactory("Controller");
         feeConverterFactory = <FeeConverter__factory>await ethers.getContractFactory("FeeConverter");
         zeroXFeeCollectorFactory =
@@ -69,13 +64,8 @@ describe("FeeConverter contract", function () {
                 await ethers.getContractFactory("ZeroXProtocolMarketMakerFeeCollector");
 
         uniswapV2BatchSwapRouter = await uniswapV2BatchSwapRouterFactory.deploy(UNISWAP_ROUTER_ADDRESS);
-        metricShare = await metricShareFactory.deploy(METRIC_TOKEN);
-        metricLpShare = await metricLpShareFactory.deploy(
-            METRIC_TOKEN,
-            METRIC_ETH_UNI_V2_LP_TOKEN,
-            "xlMETRIC",
-            "xlMETRIC"
-        );
+        metricShare = await metricShareFactory.deploy(METRIC_TOKEN, "Metric Revenue Share", "rsMETRIC");
+        metricSharePool2 = await metricShareFactory.deploy(METRIC_TOKEN, "Metric Revenue Share pool 2", "rs2METRIC");
 
         controller =
             await controllerFactory.deploy(
@@ -83,7 +73,7 @@ describe("FeeConverter contract", function () {
                     receiver: metricShare.address,
                     share: BigNumber.from("40000000000000000000")
                 }, {
-                    receiver: metricLpShare.address,
+                    receiver: metricSharePool2.address,
                     share: BigNumber.from("60000000000000000000")
                 }],
                 [],
@@ -155,7 +145,7 @@ describe("FeeConverter contract", function () {
             expect(await ethers.provider.getBalance(feeConverter.address)).to.be.equal(0);
             expect(await metricToken.balanceOf(user.address)).to.be.equal(ethers.utils.parseEther("9.821108685826061333"));
             expect(await metricToken.balanceOf(metricShare.address)).to.be.equal(ethers.utils.parseEther("388.915903958712028791"));
-            expect(await metricToken.balanceOf(metricLpShare.address)).to.be.equal(ethers.utils.parseEther("583.373855938068043188"));
+            expect(await metricToken.balanceOf(metricSharePool2.address)).to.be.equal(ethers.utils.parseEther("583.373855938068043188"));
 
         });
         it("Should approve token for router only when needed", async function(){
@@ -219,7 +209,7 @@ describe("FeeConverter contract", function () {
             expect(await wethToken.balanceOf(feeConverter.address)).to.be.equal(0);
             expect(await metricToken.balanceOf(user.address)).to.be.equal(ethers.utils.parseEther("15.511448750565022108"));
             expect(await metricToken.balanceOf(metricShare.address)).to.be.equal(ethers.utils.parseEther("221.527126267928288741"));
-            expect(await metricToken.balanceOf(metricLpShare.address)).to.be.equal(ethers.utils.parseEther("332.290689401892433112"));
+            expect(await metricToken.balanceOf(metricSharePool2.address)).to.be.equal(ethers.utils.parseEther("332.290689401892433112"));
 
         });
     });

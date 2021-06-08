@@ -2,8 +2,7 @@ import { ethers } from 'hardhat';
 import {
     Controller__factory, FeeConverter__factory,
     HidingGameRewardsCollector__factory,
-    MetricLpShare__factory,
-    MetricShare__factory,
+    RevenueShare__factory,
     UniswapV2BatchSwapRouter__factory,
     ZeroXProtocolMarketMakerFeeCollector__factory
 } from "../typechain";
@@ -25,24 +24,12 @@ async function main() {
 
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
-    const MetricShare: MetricShare__factory =
-        <MetricShare__factory>await ethers.getContractFactory("MetricShare");
+    const MetricShare: RevenueShare__factory =
+        <RevenueShare__factory>await ethers.getContractFactory("RevenueShare");
 
-    const metricShare = await MetricShare.deploy(METRIC_TOKEN);
+    const metricShare = await MetricShare.deploy(METRIC_TOKEN, "Metric Revenue Share", "rsMETRIC");
 
     console.log("MetricShare address:", metricShare.address);
-
-    const MetricLpShare: MetricLpShare__factory =
-        <MetricLpShare__factory>await ethers.getContractFactory("MetricLpShare");
-
-    const metricLpShare = await MetricLpShare.deploy(
-        METRIC_TOKEN,
-        METRIC_ETH_UNI_V2_LP_TOKEN,
-        "Metric Uni LP stake",
-        "xlMETRIC"
-    );
-
-    console.log("MetricLpShare address:", metricLpShare.address);
 
     const UniswapBatchRouter: UniswapV2BatchSwapRouter__factory =
         <UniswapV2BatchSwapRouter__factory>await ethers.getContractFactory("UniswapV2BatchSwapRouter");
@@ -55,11 +42,7 @@ async function main() {
     const controller = await Controller.deploy(
         [{
             receiver: metricShare.address,
-            share: ethers.utils.parseEther("40.0")
-        },
-        {
-            receiver: metricLpShare.address,
-            share: ethers.utils.parseEther("60.0")
+            share: ethers.utils.parseEther("100.0")
         }],
         [],
         uniswapBatchRouter.address,
@@ -75,27 +58,27 @@ async function main() {
 
     console.log("FeeConverter address:", feeConverter.address);
 
-    const HidingGameRewardsCollector: HidingGameRewardsCollector__factory =
-        <HidingGameRewardsCollector__factory>await ethers.getContractFactory("HidingGameRewardsCollector");
+    // const HidingGameRewardsCollector: HidingGameRewardsCollector__factory =
+    //     <HidingGameRewardsCollector__factory>await ethers.getContractFactory("HidingGameRewardsCollector");
+    //
+    // const hidingGameRewardsCollector = await HidingGameRewardsCollector.deploy(HIDING_GAME_REWARD_CONTRACT);
+    //
+    // console.log("HidingGameRewardsCollector address:", hidingGameRewardsCollector.address);
 
-    const hidingGameRewardsCollector = await HidingGameRewardsCollector.deploy(HIDING_GAME_REWARD_CONTRACT);
-
-    console.log("HidingGameRewardsCollector address:", hidingGameRewardsCollector.address);
-
-    const ZeroXProtocolMarketMakerFeeCollector: ZeroXProtocolMarketMakerFeeCollector__factory =
-        <ZeroXProtocolMarketMakerFeeCollector__factory>await ethers.getContractFactory("ZeroXProtocolMarketMakerFeeCollector");
-
-    const zeroXProtocolMarketMakerFeeCollector = await ZeroXProtocolMarketMakerFeeCollector.deploy(
-        WETH_TOKEN,
-        feeConverter.address
-    );
-
-    console.log("ZeroXProtocolMarketMakerFeeCollector address:", zeroXProtocolMarketMakerFeeCollector.address);
-
-    await controller.setFeeCollectors([
-        hidingGameRewardsCollector.address,
-        zeroXProtocolMarketMakerFeeCollector.address
-    ])
+    // const ZeroXProtocolMarketMakerFeeCollector: ZeroXProtocolMarketMakerFeeCollector__factory =
+    //     <ZeroXProtocolMarketMakerFeeCollector__factory>await ethers.getContractFactory("ZeroXProtocolMarketMakerFeeCollector");
+    //
+    // const zeroXProtocolMarketMakerFeeCollector = await ZeroXProtocolMarketMakerFeeCollector.deploy(
+    //     WETH_TOKEN,
+    //     feeConverter.address
+    // );
+    //
+    // console.log("ZeroXProtocolMarketMakerFeeCollector address:", zeroXProtocolMarketMakerFeeCollector.address);
+    //
+    // await controller.setFeeCollectors([
+    //     hidingGameRewardsCollector.address,
+    //     zeroXProtocolMarketMakerFeeCollector.address
+    // ])
 }
 
 main()

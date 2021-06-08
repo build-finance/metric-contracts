@@ -1,0 +1,103 @@
+// SPDX-License-Identifier: MIT
+// @author: https://github.com/SHA-2048
+
+pragma solidity 0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+/**
+ * Contract logic borrowed from sushi's SushiBar
+ * open source contract
+ *
+ * $TOKEN refers to any ERC20 used by the contract
+ * as underlying asset
+ *
+ * The goal here is to share $TOKEN revenues with users
+ * staking their $TOKEN in the contract
+ *
+ * Each stake mints $rsTOKEN shares. These shares
+ * gain in value with time as the contract receives
+ * more $TOKEN from trading fees.
+ *
+ * At leave, $rsTOKEN shares will be burned to unlock
+ * underlying $TOKEN
+ *
+ * WARNING: If $rsTOKEN tokens are transferred to the
+ * the contract, it is equivalent to a burn and
+ * underlying $TOKEN tokens will get distributed
+ * to existing $rsTOKEN holders
+ */
+
+contract RevenueShare is ERC20 {
+
+    IERC20 public underlying;
+
+    constructor(
+        IERC20 _underlying,
+        string memory _name,
+        string memory _symbol
+    ) ERC20(_name, _symbol) {
+        underlying = _underlying;
+    }
+
+    function enter(uint256 _underlyingAmount) public {
+        _mint(msg.sender, _shares(_underlyingAmount));
+        underlying.transferFrom(msg.sender, address(this), _underlyingAmount);
+        _burnLockedShares();
+    }
+
+    function leave(uint256 _shareAmount) public {
+        _burnLockedShares();
+        underlying.transfer(msg.sender, _underlyingOf(_shareAmount));
+        _burn(msg.sender, _shareAmount);
+    }
+
+    function sharePrice() public view returns (uint256) {
+        uint256 shares = _totalSupply();
+        if (shares == 0) {
+            return 1e18;
+        }
+
+        return balance() * 1e18 / shares;
+    }
+
+    function balance() public view returns (uint256) {
+        return underlying.balanceOf(address(this));
+    }
+
+    function _shares(uint256 _underlyingAmount) private view returns (uint256) {
+        uint256 totalShares = _totalSupply();
+        if (totalShares == 0) {
+            return _underlyingAmount;
+        }
+
+        uint256 totalStaked = underlying.balanceOf(address(this));
+        return _underlyingAmount * totalShares / totalStaked;
+    }
+
+    function _underlyingOf(uint256 _shareAmount) private view returns (uint256) {
+        uint256 totalShares = _totalSupply();
+        if (totalShares == 0) {
+            return 0;
+        }
+
+        uint256 totalStaked = underlying.balanceOf(address(this));
+        return _shareAmount * totalStaked / totalShares;
+    }
+
+    function _totalSupply() private view returns(uint256) {
+        return totalSupply() - _lockedShares();
+    }
+
+    function _burnLockedShares() private {
+        uint256 locked = _lockedShares();
+        if (locked > 0) {
+            _burn(address(this), locked);
+        }
+    }
+
+    function _lockedShares() private view returns(uint256) {
+        return balanceOf(address(this));
+    }
+}
