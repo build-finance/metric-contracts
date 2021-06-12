@@ -35,7 +35,7 @@ describe("RevenueShare contract", function () {
     describe("Deployment", function () {
         it("Should assign MetricToken as underlying asset for RevenueShare", async function () {
             expect(await RevenueShare.underlying()).to.equal(MetricToken.address);
-            expect(await RevenueShare.balance()).to.be.equal(0);
+            expect(await RevenueShare.balanceUnderlying()).to.be.equal(0);
             expect(await RevenueShare.sharePrice()).to.be.equal("1000000000000000000");
         });
     });
@@ -63,7 +63,7 @@ describe("RevenueShare contract", function () {
 
                 expect(RevenueShare.connect(addr2).enter(100)).to.not.be.reverted;
                 expect(await MetricToken.balanceOf(addr2.address)).to.be.equal(0);
-                expect(await RevenueShare.balance()).to.be.equal(100);
+                expect(await RevenueShare.balanceUnderlying()).to.be.equal(100);
                 expect(await RevenueShare.sharePrice()).to.be.equal("1000000000000000000");
             });
 

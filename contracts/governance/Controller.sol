@@ -5,23 +5,26 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../libraries/Structures.sol";
-import "../interfaces/IBatchTokenSwapRouter.sol";
-import "../interfaces/IFeeCollector.sol";
+import "../interfaces/ISwapRouter.sol";
 
 contract Controller is Ownable, Pausable {
 
+    struct RewardReceiver {
+        address receiver;
+        uint share;
+    }
+
     IERC20 public rewardToken;
-    IFeeCollector[] public feeCollectors;
-    Structures.RewardReceiver[] public rewardReceivers;
-    IBatchTokenSwapRouter public swapRouter;
+    address public feeConverter;
+
+    RewardReceiver[] public rewardReceivers;
+    ISwapRouter public swapRouter;
 
     uint public feeConversionIncentive;
 
     constructor(
-        Structures.RewardReceiver[] memory _rewardReceivers,
-        IFeeCollector[] memory _feeCollectors,
-        IBatchTokenSwapRouter _swapRouter,
+        RewardReceiver[] memory _rewardReceivers,
+        ISwapRouter _swapRouter,
         uint _feeConversionIncentive,
         IERC20 _rewardToken
     ) {
@@ -32,38 +35,21 @@ contract Controller is Ownable, Pausable {
         for(uint i = 0; i < _rewardReceivers.length; i++) {
             rewardReceivers.push(_rewardReceivers[i]);
         }
-
-        for(uint i = 0; i < _feeCollectors.length; i++) {
-            feeCollectors.push(_feeCollectors[i]);
-        }
-
     }
 
-    function getRewardReceivers() public view returns(Structures.RewardReceiver[] memory){
+    function setFeeConverter(address _feeConverter) external onlyOwner {
+        feeConverter = _feeConverter;
+    }
+
+    function getRewardReceivers() external view returns(RewardReceiver[] memory){
         return rewardReceivers;
     }
 
-    function getFeeCollectors() public view returns(IFeeCollector[] memory) {
-        return feeCollectors;
-    }
-
-    function setRewardReceivers(
-        Structures.RewardReceiver[] memory _rewardReceivers
-    ) onlyOwner external {
+    function setRewardReceivers(RewardReceiver[] memory _rewardReceivers) onlyOwner external {
         delete rewardReceivers;
 
         for(uint i = 0; i < _rewardReceivers.length; i++) {
             rewardReceivers.push(_rewardReceivers[i]);
-        }
-    }
-
-    function setFeeCollectors(
-        IFeeCollector[] memory _feeCollectors
-    ) onlyOwner external {
-        delete feeCollectors;
-
-        for(uint i = 0; i < _feeCollectors.length; i++) {
-            feeCollectors.push(_feeCollectors[i]);
         }
     }
 
@@ -75,11 +61,11 @@ contract Controller is Ownable, Pausable {
         rewardToken = _token;
     }
 
-    function pause() public onlyOwner {
+    function pause() external onlyOwner {
         _pause();
     }
 
-    function unpause() public onlyOwner {
+    function unpause() external onlyOwner {
         _unpause();
     }
 

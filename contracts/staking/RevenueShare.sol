@@ -41,63 +41,63 @@ contract RevenueShare is ERC20 {
         underlying = _underlying;
     }
 
-    function enter(uint256 _underlyingAmount) public {
+    function enter(uint _underlyingAmount) external {
         _mint(msg.sender, _shares(_underlyingAmount));
         underlying.transferFrom(msg.sender, address(this), _underlyingAmount);
         _burnLockedShares();
     }
 
-    function leave(uint256 _shareAmount) public {
+    function leave(uint _shareAmount) external {
         _burnLockedShares();
         underlying.transfer(msg.sender, _underlyingOf(_shareAmount));
         _burn(msg.sender, _shareAmount);
     }
 
-    function sharePrice() public view returns (uint256) {
-        uint256 shares = _totalSupply();
+    function sharePrice() external view returns (uint) {
+        uint shares = _totalSupply();
         if (shares == 0) {
             return 1e18;
         }
 
-        return balance() * 1e18 / shares;
+        return balanceUnderlying() * 1e18 / shares;
     }
 
-    function balance() public view returns (uint256) {
+    function balanceUnderlying() public view returns (uint) {
         return underlying.balanceOf(address(this));
     }
 
-    function _shares(uint256 _underlyingAmount) private view returns (uint256) {
-        uint256 totalShares = _totalSupply();
+    function _shares(uint _underlyingAmount) internal view returns (uint) {
+        uint totalShares = _totalSupply();
         if (totalShares == 0) {
             return _underlyingAmount;
         }
 
-        uint256 totalStaked = underlying.balanceOf(address(this));
+        uint totalStaked = underlying.balanceOf(address(this));
         return _underlyingAmount * totalShares / totalStaked;
     }
 
-    function _underlyingOf(uint256 _shareAmount) private view returns (uint256) {
-        uint256 totalShares = _totalSupply();
+    function _underlyingOf(uint _shareAmount) internal view returns (uint) {
+        uint totalShares = _totalSupply();
         if (totalShares == 0) {
             return 0;
         }
 
-        uint256 totalStaked = underlying.balanceOf(address(this));
+        uint totalStaked = underlying.balanceOf(address(this));
         return _shareAmount * totalStaked / totalShares;
     }
 
-    function _totalSupply() private view returns(uint256) {
+    function _totalSupply() internal view returns(uint) {
         return totalSupply() - _lockedShares();
     }
 
-    function _burnLockedShares() private {
-        uint256 locked = _lockedShares();
+    function _burnLockedShares() internal {
+        uint locked = _lockedShares();
         if (locked > 0) {
             _burn(address(this), locked);
         }
     }
 
-    function _lockedShares() private view returns(uint256) {
+    function _lockedShares() internal view returns(uint) {
         return balanceOf(address(this));
     }
 }
