@@ -44,8 +44,7 @@ contract UniswapV2SwapRouter is ISwapRouter, Constants {
 
     function compound(
         address _token,
-        uint _amount,
-        uint _minSwapOutput
+        uint _amount
     ) external override {
 
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
@@ -59,7 +58,7 @@ contract UniswapV2SwapRouter is ISwapRouter, Constants {
 
         uniswapRouter.swapExactTokensForTokens(
             _amount / 2,
-            _minSwapOutput,
+            0,
             _path(_token, uniswapRouter.WETH()),
             address(this),
             block.timestamp + 1000
@@ -70,8 +69,8 @@ contract UniswapV2SwapRouter is ISwapRouter, Constants {
             uniswapRouter.WETH(),
             IERC20(_token).balanceOf(address(this)),
             IERC20(uniswapRouter.WETH()).balanceOf(address(this)),
-            IERC20(_token).balanceOf(address(this)) * 95 / 100,
-            IERC20(uniswapRouter.WETH()).balanceOf(address(this)) * 95 / 100,
+            0,
+            0,
             address(msg.sender),
             block.timestamp + 1000
         );

@@ -20,14 +20,14 @@ contract RevenueShareVault is RevenueShare, Constants {
         revenueToken = _revenueToken;
     }
 
-    function compound(uint _minSwapOutput) external {
+    function compound() external {
         uint balance = revenueToken.balanceOf(address(this));
 
         if (revenueToken.allowance(address(this), address(swapRouter)) < MAX_INT) {
             revenueToken.approve(address(swapRouter), MAX_INT);
         }
 
-        swapRouter.compound(address(revenueToken), balance, _minSwapOutput);
+        swapRouter.compound(address(revenueToken), balance);
     }
 
 }

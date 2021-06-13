@@ -68,9 +68,7 @@ describe("RevenueShareVault contract", function () {
             let weth: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", WETH_TOKEN));
             await metric.connect(metricFeeRecipient).transfer(RevenueShareVault.address, ethers.utils.parseEther("10"));
 
-            await RevenueShareVault.compound(
-                ethers.utils.parseEther("0.001")
-            );
+            await RevenueShareVault.compound();
 
             expect(await metricLp.balanceOf(RevenueShareVault.address)).to.be.equal(ethers.utils.parseEther("0.076034829129548590"));
             expect(await metric.balanceOf(RevenueShareVault.address)).to.be.equal(ethers.utils.parseEther("0.008604771517898225"));

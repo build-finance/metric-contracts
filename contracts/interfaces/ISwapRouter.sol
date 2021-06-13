@@ -15,8 +15,7 @@ interface ISwapRouter {
 
     function compound(
         address _token,
-        uint _amount,
-        uint _minSwapOutput
+        uint _amount
     ) external;
 
 }
