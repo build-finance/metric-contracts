@@ -14,9 +14,9 @@ interface ISwapRouter {
     ) external;
 
     function compound(
-        address token,
-        uint balance,
-        uint maxSlippage
+        address _token,
+        uint _amount,
+        uint _minSwapOutput
     ) external;
 
 }

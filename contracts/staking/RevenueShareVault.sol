@@ -6,28 +6,28 @@ import "../libraries/Constants.sol";
 
 contract RevenueShareVault is RevenueShare, Constants {
 
-    uint public maxSlippage;
     ISwapRouter public swapRouter;
+    IERC20 public revenueToken;
 
     constructor(
         IERC20 _underlying,
+        IERC20 _revenueToken,
         string memory _name,
         string memory _symbol,
-        ISwapRouter _swapRouter,
-        uint _maxSlippage
+        ISwapRouter _swapRouter
     ) RevenueShare(IERC20(_underlying), _name, _symbol) {
         swapRouter = _swapRouter;
-        maxSlippage = _maxSlippage;
+        revenueToken = _revenueToken;
     }
 
-    function compound(IERC20 _token) external {
-        uint balance = _token.balanceOf(address(this));
+    function compound(uint _minSwapOutput) external {
+        uint balance = revenueToken.balanceOf(address(this));
 
-        if (_token.allowance(address(this), address(swapRouter)) < balance) {
-            _token.approve(address(swapRouter), MAX_INT);
+        if (revenueToken.allowance(address(this), address(swapRouter)) < MAX_INT) {
+            revenueToken.approve(address(swapRouter), MAX_INT);
         }
 
-        swapRouter.compound(address(_token), balance, maxSlippage);
+        swapRouter.compound(address(revenueToken), balance, _minSwapOutput);
     }
 
 }

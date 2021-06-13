@@ -69,7 +69,7 @@ contract FeeConverter is Multicall, Controllable, Constants {
     ) internal {
         ISwapRouter router = controller.swapRouter();
 
-        if (IERC20(_token).allowance(address(this), address(router)) < _inputAmount) {
+        if (IERC20(_token).allowance(address(this), address(router)) < MAX_INT) {
             IERC20(_token).approve(address(router), MAX_INT);
         }
 

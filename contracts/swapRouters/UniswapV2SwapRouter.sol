@@ -29,7 +29,7 @@ contract UniswapV2SwapRouter is ISwapRouter, Constants {
         require(_token != _outputToken, "Output token must not be given in input");
 
         IERC20(_token).transferFrom(msg.sender, address(this), _supplyTokenAmount);
-        if (IERC20(_token).allowance(address(this), address(uniswapRouter)) < _supplyTokenAmount) {
+        if (IERC20(_token).allowance(address(this), address(uniswapRouter)) < MAX_INT) {
             IERC20(_token).approve(address(uniswapRouter), MAX_INT);
         }
 
@@ -43,19 +43,50 @@ contract UniswapV2SwapRouter is ISwapRouter, Constants {
     }
 
     function compound(
-        address token,
-        uint balance,
-        uint maxSlippage
+        address _token,
+        uint _amount,
+        uint _minSwapOutput
     ) external override {
+
+        IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+
+        if (IERC20(_token).allowance(address(this), address(uniswapRouter)) < MAX_INT) {
+            IERC20(_token).approve(address(uniswapRouter), MAX_INT);
+        }
+        if (IERC20(uniswapRouter.WETH()).allowance(address(this), address(uniswapRouter)) < MAX_INT) {
+            IERC20(uniswapRouter.WETH()).approve(address(uniswapRouter), MAX_INT);
+        }
+
+        uniswapRouter.swapExactTokensForTokens(
+            _amount / 2,
+            _minSwapOutput,
+            _path(_token, uniswapRouter.WETH()),
+            address(this),
+            block.timestamp + 1000
+        );
+
+        uniswapRouter.addLiquidity(
+            _token,
+            uniswapRouter.WETH(),
+            IERC20(_token).balanceOf(address(this)),
+            IERC20(uniswapRouter.WETH()).balanceOf(address(this)),
+            IERC20(_token).balanceOf(address(this)) * 95 / 100,
+            IERC20(uniswapRouter.WETH()).balanceOf(address(this)) * 95 / 100,
+            address(msg.sender),
+            block.timestamp + 1000
+        );
+
+        IERC20(_token).transfer(msg.sender, IERC20(_token).balanceOf(address(this)));
+        IERC20(uniswapRouter.WETH()).transfer(msg.sender, IERC20(uniswapRouter.WETH()).balanceOf(address(this)));
 
     }
 
     function _path(address _token, address _outputToken) internal view returns (address[] memory) {
 
-        if (_token == uniswapRouter.WETH()) {
+        if (_token == uniswapRouter.WETH() || _outputToken == uniswapRouter.WETH()) {
 
             address[] memory path = new address[](2);
-            path[0] = uniswapRouter.WETH();
+            path[0] = _token;
             path[1] = _outputToken;
 
             return path;
