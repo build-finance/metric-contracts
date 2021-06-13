@@ -11,6 +11,22 @@ import "../libraries/Constants.sol";
 import "../governance/Controller.sol";
 import "../governance/Controllable.sol";
 
+/**
+ * FeeConverter is designed to receive any token accrued from
+ * Metric Exchange fees. The ERC20 tokens can be converted into METRIC
+ * and the caller will get an incentive as a % of the METRIC
+ * balance generated. There is a function to trigger METRIC
+ * distribution over eligible recipients. There is also
+ * a wrapEth function, in case contract holds ETH.
+ * All calls can be sequenced using the MultiCall
+ * interface available on the contract
+ *
+ * All parameters can be changed on the Controller
+ * contract: swapRouter, rewardToken, revenue recipients
+ * as well as the fee conversion % incentive
+ *
+ * all action can be paused as well by the Controller.
+ */
 contract FeeConverter is Multicall, Controllable, Constants {
 
     event FeeDistribution(

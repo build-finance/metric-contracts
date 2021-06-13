@@ -3,6 +3,10 @@
 This repository contains contracts related to Metric's fee collection and distribution logic
 The exchange app can be used in [metric.exchange](https://metric.exchange)
 
+Here is a high level view of implemented contracts and their interactions:
+
+![Architecture](assets/architecture.png)
+
 ## development
 
 The project uses `hardhat` for compiling/testing/deploying purposes. 
