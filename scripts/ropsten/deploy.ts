@@ -3,7 +3,6 @@ import {
     Controller,
     Controller__factory,
     FeeConverter__factory,
-    MetricToken__factory,
     RevenueShare__factory,
     RevenueShareVault__factory,
     UniswapV2SwapRouter__factory
@@ -14,6 +13,7 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     let UNISWAP_ROUTER_ADDRESS = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+    let METRIC_TOKEN = "0xbFe5392d1b804329F77BDa57f4c38Ac6C5aA286F";
     let METRIC_ETH_UNI_V2_LP_TOKEN = "0x432E7a45a8c2f1699b9B6561e5F1224F8442A603";
 
     console.log(
@@ -23,17 +23,10 @@ async function main() {
 
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
-    const MetricToken: MetricToken__factory =
-        <MetricToken__factory>await ethers.getContractFactory("MetricToken");
-
-    const metricToken = await MetricToken.deploy();
-
-    console.log("Metric token address:", metricToken.address);
-
     const MetricShare: RevenueShare__factory =
         <RevenueShare__factory>await ethers.getContractFactory("RevenueShare");
 
-    const metricShare = await MetricShare.deploy(metricToken.address, "Metric Revenue Share", "xMETRIC");
+    const metricShare = await MetricShare.deploy(METRIC_TOKEN, "Metric Revenue Share", "xMETRIC");
 
     console.log("MetricShare address:", metricShare.address);
 
@@ -48,7 +41,7 @@ async function main() {
 
     const metricShareVault = await MetricShareVault.deploy(
         METRIC_ETH_UNI_V2_LP_TOKEN,
-        metricToken.address,
+        METRIC_TOKEN,
         "Metric LP Revenue Share",
         "xlMETRIC",
         uniswapRouter.address
@@ -69,7 +62,7 @@ async function main() {
         }],
         uniswapRouter.address,
         ethers.utils.parseEther("2.0"),
-        metricToken.address
+        METRIC_TOKEN
     );
 
     console.log("Controller address:", controller.address);
