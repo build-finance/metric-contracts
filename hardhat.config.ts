@@ -1,5 +1,6 @@
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-ethers';
+import '@nomiclabs/hardhat-etherscan';
 import 'hardhat-deploy';
 import '@typechain/hardhat';
 import 'hardhat-gas-reporter';
@@ -15,7 +16,16 @@ const config: HardhatUserConfig = {
         url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_MAINNET_API_KEY}`,
         blockNumber: parseInt(<string>process.env.ETH_MAINNET_BLOCK_NUMBER)
       }
-    }
+    },
+    ropsten: {
+      url: `https://eth-ropsten.alchemyapi.io/v2/${process.env.ALCHEMY_ROPSTEN_API_KEY}`,
+      chainId: 3,
+      gasPrice: 20000000000,
+      accounts: [`0x${process.env.PRIVATE_KEY}`],
+    },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY
   },
   gasReporter: {
     currency: 'EUR',
