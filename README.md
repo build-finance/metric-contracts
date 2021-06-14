@@ -23,7 +23,7 @@ deploy scripts are under [scripts](scripts) folder. Example of deploy command:
 
 `npx hardhat run scripts/ropsten/deploy.ts --network ropsten`
 
-The project hardhat [etherscan-plugin](https://hardhat.org/plugins/nomiclabs-hardhat-etherscan.html) for
+The project uses hardhat [etherscan-plugin](https://hardhat.org/plugins/nomiclabs-hardhat-etherscan.html) for
 verifying contracts
 
 ### Ropsten testnet
