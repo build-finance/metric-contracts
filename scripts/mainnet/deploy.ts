@@ -51,16 +51,9 @@ async function main() {
     const Controller: Controller__factory =
         <Controller__factory>await ethers.getContractFactory("Controller");
     const controller = await Controller.deploy(
-        [{
-            receiver: metricShare.address,
-            share: ethers.utils.parseEther("40.0")
-        },
-        {
-            receiver: metricShareVault.address,
-            share: ethers.utils.parseEther("60.0")
-        }],
+        [],
         uniswapRouter.address,
-        ethers.utils.parseEther("2.0"),
+        ethers.utils.parseEther("0"),
         METRIC_TOKEN
     );
 
