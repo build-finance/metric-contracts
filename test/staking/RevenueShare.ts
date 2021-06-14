@@ -74,19 +74,6 @@ describe("RevenueShare contract", function () {
                 expect(await RevenueShare.balanceOf(addr2.address)).to.be.equal(100);
             });
 
-            it("Should burn xMETRIC available in the contract if any", async function() {
-                await MetricToken.connect(addr2).mint(100);
-                await MetricToken.connect(addr2).approve(RevenueShare.address, 100);
-                await RevenueShare.connect(addr2).enter(100);
-
-                await RevenueShare.connect(addr2).transfer(RevenueShare.address, 100);
-
-                await MetricToken.connect(addr1).mint(100);
-                await MetricToken.connect(addr1).approve(RevenueShare.address, 100);
-                await RevenueShare.connect(addr1).enter(50);
-
-                expect(await RevenueShare.balanceOf(RevenueShare.address)).to.be.equal(0);
-            });
         });
 
         describe("Calls to RevenueShare.leave", function () {
@@ -103,15 +90,6 @@ describe("RevenueShare contract", function () {
 
                 expect(RevenueShare.connect(addr1).leave(100))
                     .to.be.revertedWith("ERC20: burn amount exceeds balance");
-            });
-
-            it("Should burn user xMETRIC tokens on success", async function() {
-                await MetricToken.connect(addr2).mint(100);
-                await MetricToken.connect(addr2).approve(RevenueShare.address, 100);
-                await RevenueShare.connect(addr2).enter(100);
-
-                expect(RevenueShare.connect(addr2).leave(100)).to.not.be.reverted;
-                expect(await RevenueShare.balanceOf(addr2.address)).to.be.equal(0);
             });
 
             it("Should transfer METRIC tokens to user", async function() {
@@ -167,6 +145,21 @@ describe("RevenueShare contract", function () {
 
                 expect(await MetricToken.balanceOf(addr2.address)).to.be.equal(125);
                 expect(await MetricToken.balanceOf(addr1.address)).to.be.equal(125);
+            });
+
+        });
+
+        describe("Calls to RevenueShare.burnLockedShares", async function() {
+
+            it("Should burn xMETRIC available in the contract if any", async function() {
+                await MetricToken.connect(addr1).mint(100);
+                await MetricToken.connect(addr1).approve(RevenueShare.address, 100);
+                await RevenueShare.connect(addr1).enter(100);
+                await RevenueShare.connect(addr1).transfer(RevenueShare.address, 100);
+
+                await RevenueShare.connect(addr1).burnLockedShares();
+
+                expect(await RevenueShare.balanceOf(RevenueShare.address)).to.be.equal(0);
             });
 
         });

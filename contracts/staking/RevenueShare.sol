@@ -44,11 +44,9 @@ contract RevenueShare is ERC20 {
     function enter(uint _underlyingAmount) external {
         _mint(msg.sender, _shares(_underlyingAmount));
         underlying.transferFrom(msg.sender, address(this), _underlyingAmount);
-        _burnLockedShares();
     }
 
     function leave(uint _shareAmount) external {
-        _burnLockedShares();
         underlying.transfer(msg.sender, _underlyingOf(_shareAmount));
         _burn(msg.sender, _shareAmount);
     }
@@ -64,6 +62,10 @@ contract RevenueShare is ERC20 {
 
     function balanceUnderlying() public view returns (uint) {
         return underlying.balanceOf(address(this));
+    }
+
+    function burnLockedShares() external {
+        _burn(address(this), _lockedShares());
     }
 
     function _shares(uint _underlyingAmount) internal view returns (uint) {
@@ -88,13 +90,6 @@ contract RevenueShare is ERC20 {
 
     function _totalSupply() internal view returns(uint) {
         return totalSupply() - _lockedShares();
-    }
-
-    function _burnLockedShares() internal {
-        uint locked = _lockedShares();
-        if (locked > 0) {
-            _burn(address(this), locked);
-        }
     }
 
     function _lockedShares() internal view returns(uint) {
