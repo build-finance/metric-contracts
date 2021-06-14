@@ -70,8 +70,8 @@ describe("RevenueShareVault contract", function () {
 
             await RevenueShareVault.compound();
 
-            expect(await metricLp.balanceOf(RevenueShareVault.address)).to.be.equal(ethers.utils.parseEther("0.076034829129548590"));
-            expect(await metric.balanceOf(RevenueShareVault.address)).to.be.equal(ethers.utils.parseEther("0.008604771517898225"));
+            expect(await metricLp.balanceOf(RevenueShareVault.address)).to.be.equal(ethers.utils.parseEther("0.079309268623665039"));
+            expect(await metric.balanceOf(RevenueShareVault.address)).to.be.equal(ethers.utils.parseEther("0.008329361038839100"));
             expect(await weth.balanceOf(RevenueShareVault.address)).to.be.equal(0);
 
             expect(await metric.balanceOf(uniswapV2SwapRouter.address)).to.be.equal(0);

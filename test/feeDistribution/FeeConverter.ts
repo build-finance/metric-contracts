@@ -23,6 +23,7 @@ describe("FeeConverter contract", function () {
 
     let METRIC_FEE_RECIPIENT_ADDRESS = "0x52427b0035f494a21a0a4a1abe04d679f789c821";
     let BUILD_TOKEN = "0x6e36556b3ee5aa28def2a8ec3dae30ec2b208739";
+    let DPI_TOKEN = "0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b";
     let WETH_TOKEN = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 
     let feeConverterFactory: FeeConverter__factory;
@@ -187,6 +188,28 @@ describe("FeeConverter contract", function () {
             );
 
         });
+        it("Should not fail when batching multiple valid calls", async function() {
+
+            let dpiToken: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", DPI_TOKEN));
+            let metric: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", METRIC_TOKEN));
+            await dpiToken.connect(metricFeeRecipient).transfer(feeConverter.address, ethers.utils.parseEther("1.0"))
+
+            await feeConverter.connect(user).multicall(
+                [
+                    feeConverter.interface.encodeFunctionData("wrapETH"),
+                    feeConverter.interface.encodeFunctionData("convertToken", [
+                        DPI_TOKEN,
+                        ethers.utils.parseEther("1.0"),
+                        BigNumber.from(0),
+                        user.address
+                    ]),
+                    feeConverter.interface.encodeFunctionData("transferRewardTokenToReceivers")
+                ]
+            );
+
+            expect(await metric.balanceOf(metricShare.address)).to.be.equal(ethers.utils.parseEther("63.721694000939713731"));
+            expect(await metric.balanceOf(metricSharePool2.address)).to.be.equal(ethers.utils.parseEther("95.582541001409570598"));
+        })
     });
 
 });
