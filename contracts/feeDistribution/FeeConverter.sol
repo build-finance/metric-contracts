@@ -48,10 +48,10 @@ contract FeeConverter is Multicall, Controllable, Constants {
         _executeConversion(_token, _inputAmount, _minOutput);
         uint rewardTokenBalanceAfterConversion = controller.rewardToken().balanceOf(address(this));
 
-        uint convertedRewardTokenBalance = rewardTokenBalanceAfterConversion - rewardTokenBalanceBeforeConversion;
-        uint callerIncentive = convertedRewardTokenBalance * controller.feeConversionIncentive() / 100e18;
-
-        _sendRewardToken(_incentiveCollector, callerIncentive);
+        _sendIncentiveReward(
+            _incentiveCollector,
+            rewardTokenBalanceAfterConversion - rewardTokenBalanceBeforeConversion
+        );
     }
 
     function wrapETH() external whenNotPaused {
@@ -69,13 +69,15 @@ contract FeeConverter is Multicall, Controllable, Constants {
         uint remaining = totalAmount;
         uint nbReceivers = receivers.length;
 
-        for(uint i = 0; i < nbReceivers - 1; i++) {
-            uint receiverShare = totalAmount * receivers[i].share / 100e18;
-            _sendRewardToken(receivers[i].receiver, receiverShare);
+        if (nbReceivers > 0) {
+            for(uint i = 0; i < nbReceivers - 1; i++) {
+                uint receiverShare = totalAmount * receivers[i].share / 100e18;
+                _sendRewardToken(receivers[i].receiver, receiverShare);
 
-            remaining -= receiverShare;
+                remaining -= receiverShare;
+            }
+            _sendRewardToken(receivers[nbReceivers - 1].receiver, remaining);
         }
-        _sendRewardToken(receivers[nbReceivers - 1].receiver, remaining);
     }
 
     function _executeConversion(
@@ -95,6 +97,14 @@ contract FeeConverter is Multicall, Controllable, Constants {
             _minOutput,
             address(controller.rewardToken())
         );
+    }
+
+    function _sendIncentiveReward(address _incentiveCollector, uint _totalAmount) internal {
+        uint incentiveShare = controller.feeConversionIncentive();
+        if (incentiveShare > 0) {
+            uint callerIncentive = _totalAmount * incentiveShare / 100e18;
+            _sendRewardToken(_incentiveCollector, callerIncentive);
+        }
     }
 
     function _sendRewardToken(
