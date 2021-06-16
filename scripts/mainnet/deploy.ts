@@ -41,8 +41,8 @@ async function main() {
     const metricShareVault = await MetricShareVault.deploy(
         METRIC_ETH_UNI_V2_LP_TOKEN,
         METRIC_TOKEN,
-        "Metric LP Revenue Share",
-        "xlMETRIC",
+        "Metric METRIC-ETH UNI LP Revenue Share",
+        "xMETRIC-ETH-UNI",
         uniswapRouter.address
     );
 

@@ -3,14 +3,12 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IWETH.sol";
 
-import "../libraries/Constants.sol";
-
 import "../governance/Controller.sol";
 import "../governance/Controllable.sol";
+import "../libraries/AllowanceChecker.sol";
 
 /**
  * FeeConverter is designed to receive any token accrued from
@@ -28,7 +26,7 @@ import "../governance/Controllable.sol";
  *
  * all action can be paused as well by the Controller.
  */
-contract FeeConverter is Multicall, Controllable, Constants {
+contract FeeConverter is Multicall, Controllable, AllowanceChecker {
 
     event FeeDistribution(
         address recipient,
@@ -40,13 +38,16 @@ contract FeeConverter is Multicall, Controllable, Constants {
     receive() external payable {}
 
     function convertToken(
-        address _token,
+        address[] memory _path,
         uint _inputAmount,
         uint _minOutput,
         address _incentiveCollector
     ) external whenNotPaused {
+
+        require(_path[_path.length - 1] == address(controller.rewardToken()), "Output token needs to be reward token");
+
         uint rewardTokenBalanceBeforeConversion = controller.rewardToken().balanceOf(address(this));
-        _executeConversion(_token, _inputAmount, _minOutput);
+        _executeConversion(_path, _inputAmount, _minOutput);
         uint rewardTokenBalanceAfterConversion = controller.rewardToken().balanceOf(address(this));
 
         _sendIncentiveReward(
@@ -82,21 +83,18 @@ contract FeeConverter is Multicall, Controllable, Constants {
     }
 
     function _executeConversion(
-        address _token,
+        address[] memory _path,
         uint _inputAmount,
         uint _minOutput
     ) internal {
         ISwapRouter router = controller.swapRouter();
 
-        if (IERC20(_token).allowance(address(this), address(router)) < MAX_INT) {
-            IERC20(_token).approve(address(router), MAX_INT);
-        }
+        approveIfNeeded(_path[0], address(router));
 
         controller.swapRouter().swapExactTokensForTokens(
-            _token,
+            _path,
             _inputAmount,
-            _minOutput,
-            address(controller.rewardToken())
+            _minOutput
         );
     }
 

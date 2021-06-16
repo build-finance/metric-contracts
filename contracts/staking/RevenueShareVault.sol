@@ -5,9 +5,9 @@ pragma solidity ^0.8.0;
 
 import "../interfaces/ISwapRouter.sol";
 import "./RevenueShare.sol";
-import "../libraries/Constants.sol";
+import "../libraries/AllowanceChecker.sol";
 
-contract RevenueShareVault is RevenueShare, Constants {
+contract RevenueShareVault is RevenueShare, AllowanceChecker {
 
     ISwapRouter public swapRouter;
     IERC20 public revenueToken;
@@ -26,11 +26,13 @@ contract RevenueShareVault is RevenueShare, Constants {
     function compound() external {
         uint balance = revenueToken.balanceOf(address(this));
 
-        if (revenueToken.allowance(address(this), address(swapRouter)) < MAX_INT) {
-            revenueToken.approve(address(swapRouter), MAX_INT);
-        }
+        approveIfNeeded(address(revenueToken), address(swapRouter));
 
-        swapRouter.compound(address(revenueToken), balance);
+        address[] memory path = new address[](2);
+        path[0] = address(revenueToken);
+        path[1] = swapRouter.weth();
+
+        swapRouter.compound(path, balance);
     }
 
 }

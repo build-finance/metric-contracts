@@ -8,14 +8,13 @@ interface ISwapRouter {
     function weth() external returns(address);
 
     function swapExactTokensForTokens(
-        address _token,
+        address[] memory _path,
         uint _supplyTokenAmount,
-        uint _minOutput,
-        address _outputToken
+        uint _minOutput
     ) external;
 
     function compound(
-        address _token,
+        address[] memory _path,
         uint _amount
     ) external;
 

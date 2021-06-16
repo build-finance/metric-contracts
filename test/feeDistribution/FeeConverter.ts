@@ -102,7 +102,7 @@ describe("FeeConverter contract", function () {
         it("Should not allow conversions if controller is paused", async function () {
             await controller.pause();
             expect(feeConverter.convertToken(
-                BUILD_TOKEN,
+                [BUILD_TOKEN, WETH_TOKEN, METRIC_TOKEN],
                 BigNumber.from(1),
                 BigNumber.from(1),
                 owner.address
@@ -141,6 +141,14 @@ describe("FeeConverter contract", function () {
 
 
         });
+        it("Should fail if asked to convert into non METRIC token", async function(){
+            expect(feeConverter.connect(user).convertToken(
+                [WETH_TOKEN, BUILD_TOKEN],
+                ethers.utils.parseEther("10.0"),
+                BigNumber.from(0),
+                user.address
+            )).to.be.revertedWith("Output token needs to be reward token");
+        });
         it("Should be able to correctly convert ERC20 token", async function(){
             let buildToken: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", BUILD_TOKEN));
             let metricToken: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", METRIC_TOKEN));
@@ -157,7 +165,7 @@ describe("FeeConverter contract", function () {
             expect(await ethers.provider.getBalance(feeConverter.address)).to.be.equal(ethers.utils.parseEther("1.0"));
 
             await feeConverter.connect(user).convertToken(
-                BUILD_TOKEN,
+                [BUILD_TOKEN, WETH_TOKEN, METRIC_TOKEN],
                 ethers.utils.parseEther("10.0"),
                 BigNumber.from(0),
                 user.address
@@ -174,14 +182,14 @@ describe("FeeConverter contract", function () {
             await buildToken.connect(metricFeeRecipient).transfer(feeConverter.address, ethers.utils.parseEther("2.0"))
 
             await feeConverter.connect(user).convertToken(
-                BUILD_TOKEN,
+                [BUILD_TOKEN, WETH_TOKEN, METRIC_TOKEN],
                 ethers.utils.parseEther("1.0"),
                 BigNumber.from(0),
                 user.address
             );
 
             await feeConverter.connect(user).convertToken(
-                BUILD_TOKEN,
+                [BUILD_TOKEN, WETH_TOKEN, METRIC_TOKEN],
                 ethers.utils.parseEther("1.0"),
                 BigNumber.from(0),
                 user.address
@@ -198,7 +206,7 @@ describe("FeeConverter contract", function () {
                 [
                     feeConverter.interface.encodeFunctionData("wrapETH"),
                     feeConverter.interface.encodeFunctionData("convertToken", [
-                        DPI_TOKEN,
+                        [DPI_TOKEN, WETH_TOKEN, METRIC_TOKEN],
                         ethers.utils.parseEther("1.0"),
                         BigNumber.from(0),
                         user.address

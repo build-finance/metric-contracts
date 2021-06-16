@@ -60,10 +60,9 @@ describe("UniswapV2SwapRouter contract", function () {
             expect(uniswapV2SwapRouter
                 .connect(metricFeeRecipient)
                 .swapExactTokensForTokens(
-                    METRIC_TOKEN,
+                    [METRIC_TOKEN, METRIC_TOKEN],
                     METRIC_BALANCE,
-                    BigNumber.from(0),
-                    METRIC_TOKEN
+                    BigNumber.from(0)
                 )).to.be.revertedWith("Output token must not be given in input");
         });
 
@@ -78,10 +77,9 @@ describe("UniswapV2SwapRouter contract", function () {
             await uniswapV2SwapRouter
                 .connect(metricFeeRecipient)
                 .swapExactTokensForTokens(
-                    WETH_TOKEN,
+                    [WETH_TOKEN, METRIC_TOKEN],
                     WETH_BALANCE,
-                    BigNumber.from(0),
-                    METRIC_TOKEN
+                    BigNumber.from(0)
                 );
 
             expect(await metricToken.balanceOf(metricFeeRecipient.address)).to.be.gt(originalBalance);
@@ -101,10 +99,9 @@ describe("UniswapV2SwapRouter contract", function () {
             await uniswapV2SwapRouter
                 .connect(metricFeeRecipient)
                 .swapExactTokensForTokens(
-                    AAVE_TOKEN,
+                    [AAVE_TOKEN, WETH_TOKEN, METRIC_TOKEN],
                     AAVE_BALANCE,
-                    BigNumber.from(0),
-                    METRIC_TOKEN
+                    BigNumber.from(0)
                 );
 
             expect(await metricToken.balanceOf(metricFeeRecipient.address)).to.be.gt(originalBalance);
