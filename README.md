@@ -37,3 +37,13 @@ latest deployed contracts, might change with further development:
 - Controller : `0xbC92c1b320751a7fd020DbE74D762c7407658a74`
 - FeeConverter : `0x0E10E94F21210E04ca06C4C7DbD827e5dd68AD3a`
 - METRIC-ETH UNI pair: `0x432E7a45a8c2f1699b9B6561e5F1224F8442A603`
+
+### ETH Mainnet
+
+- MetricToken : `0xefc1c73a3d8728dc4cf2a18ac5705fe93e5914ac`
+- MetricShare : `0xdBd974ec753054e78Aa8Eb959761e3d22C632490`
+- UniswapV2SwapRouter : `0xC0D469d5fa25Ef2Fdf0bb111e96f1f93f5B4c588`
+- MetricShareVault : `0x04d69Aec4eFdb5613120758d6c4cDB970f64a4E5`
+- Controller : `0xc96e4cAa735184E68E53E130cDb59ce13C8EbeC1`
+- FeeConverter : `0x88CEEBC001EFc373b7535f61B7EA21330F9D4a85`
+- METRIC-ETH UNI pair: `0xa7d707118c02dCd2beA94Ff05664DB51363c47BD`

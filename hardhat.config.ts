@@ -21,7 +21,13 @@ const config: HardhatUserConfig = {
       url: `https://eth-ropsten.alchemyapi.io/v2/${process.env.ALCHEMY_ROPSTEN_API_KEY}`,
       chainId: 3,
       gasPrice: 20000000000,
-      accounts: [`0x${process.env.PRIVATE_KEY}`],
+      accounts: [`0x${process.env.ROPSTEN_PRIVATE_KEY}`],
+    },
+    eth_mainnet: {
+      url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_MAINNET_API_KEY}`,
+      chainId: 1,
+      gasPrice: 20000000000,
+      accounts: [`0x${process.env.ETH_MAINNET_PRIVATE_KEY}`],
     },
   },
   etherscan: {

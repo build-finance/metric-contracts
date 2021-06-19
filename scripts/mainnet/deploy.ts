@@ -9,6 +9,7 @@ import {
 
 async function main() {
 
+    const gasPrice = 15000000000;
     const [deployer] = await ethers.getSigners();
 
     let UNISWAP_ROUTER_ADDRESS = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
@@ -25,13 +26,23 @@ async function main() {
     const MetricShare: RevenueShare__factory =
         <RevenueShare__factory>await ethers.getContractFactory("RevenueShare");
 
-    const metricShare = await MetricShare.deploy(METRIC_TOKEN, "Metric Revenue Share", "xMETRIC");
+    const metricShare = await MetricShare.deploy(
+        METRIC_TOKEN, "Metric Revenue Share", "xMETRIC",
+        {
+            gasPrice: gasPrice
+        }
+    );
 
     console.log("MetricShare address:", metricShare.address);
 
     const UniswapRouter: UniswapV2SwapRouter__factory =
         <UniswapV2SwapRouter__factory>await ethers.getContractFactory("UniswapV2SwapRouter");
-    const uniswapRouter = await UniswapRouter.deploy(UNISWAP_ROUTER_ADDRESS);
+    const uniswapRouter = await UniswapRouter.deploy(
+        UNISWAP_ROUTER_ADDRESS,
+        {
+            gasPrice: gasPrice
+        }
+    );
 
     console.log("UniswapV2SwapRouter address:", uniswapRouter.address);
 
@@ -41,9 +52,12 @@ async function main() {
     const metricShareVault = await MetricShareVault.deploy(
         METRIC_ETH_UNI_V2_LP_TOKEN,
         METRIC_TOKEN,
-        "Metric METRIC-ETH UNI LP Revenue Share",
-        "xMETRIC-ETH-UNI",
-        uniswapRouter.address
+        "Metric METRIC-ETH UNI-V2 Revenue Share",
+        "xMETRIC-ETH-UNI-V2",
+        uniswapRouter.address,
+        {
+            gasPrice: gasPrice
+        }
     );
 
     console.log("MetricShareVault address:", metricShareVault.address);
@@ -54,14 +68,23 @@ async function main() {
         [],
         uniswapRouter.address,
         ethers.utils.parseEther("0"),
-        METRIC_TOKEN
+        METRIC_TOKEN,
+        {
+            gasPrice: gasPrice
+        }
     );
 
     console.log("Controller address:", controller.address);
 
     const FeeConverter: FeeConverter__factory =
         <FeeConverter__factory>await ethers.getContractFactory("FeeConverter");
-    const feeConverter = await FeeConverter.deploy(controller.address);
+    const feeConverter = await FeeConverter.deploy(
+        controller.address,
+        {
+            nonce: 51,
+            gasPrice: gasPrice
+        }
+    );
 
     console.log("FeeConverter address:", feeConverter.address);
 }
