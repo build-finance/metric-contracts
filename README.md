@@ -21,7 +21,7 @@ variable
 
 deploy scripts are under [scripts](scripts) folder. Example of deploy command:
 
-`npx hardhat run scripts/ropsten/deploy.ts --network ropsten`
+`npx hardhat run scripts/ropsten/deployV0.ts --network ropsten`
 
 The project uses hardhat [etherscan-plugin](https://hardhat.org/plugins/nomiclabs-hardhat-etherscan.html) for
 verifying contracts
@@ -40,10 +40,15 @@ latest deployed contracts, might change with further development:
 
 ### ETH Mainnet
 
+### V1
 - MetricToken : `0xefc1c73a3d8728dc4cf2a18ac5705fe93e5914ac`
 - MetricShare : `0xdBd974ec753054e78Aa8Eb959761e3d22C632490`
 - UniswapV2SwapRouter : `0xC0D469d5fa25Ef2Fdf0bb111e96f1f93f5B4c588`
-- MetricShareVault : `0x04d69Aec4eFdb5613120758d6c4cDB970f64a4E5`
+- MetricShareVault : `0x04d69Aec4eFdb5613120758d6c4cDB970f64a4E5` (not used anymore)
 - Controller : `0xc96e4cAa735184E68E53E130cDb59ce13C8EbeC1`
-- FeeConverter : `0x88CEEBC001EFc373b7535f61B7EA21330F9D4a85`
+- FeeConverter : `0x88CEEBC001EFc373b7535f61B7EA21330F9D4a85` (not used anymore)
 - METRIC-ETH UNI pair: `0xa7d707118c02dCd2beA94Ff05664DB51363c47BD`
+
+### V2
+- MetricShareVault : `0xAccbBaad2182FfA54996a480f70b2301cce7F5F7`
+- FeeConverter : `0xD11b2EC32f7e9fdfFbf4134b67178E056B58f6c8`

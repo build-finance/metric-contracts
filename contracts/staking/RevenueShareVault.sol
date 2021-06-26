@@ -24,7 +24,6 @@ contract RevenueShareVault is RevenueShare, AllowanceChecker {
     }
 
     function compound() external {
-        uint balance = revenueToken.balanceOf(address(this));
 
         approveIfNeeded(address(revenueToken), address(swapRouter));
 
@@ -32,7 +31,21 @@ contract RevenueShareVault is RevenueShare, AllowanceChecker {
         path[0] = address(revenueToken);
         path[1] = swapRouter.weth();
 
-        swapRouter.compound(path, balance);
+        swapRouter.compound(path, revenueToken.balanceOf(address(this)));
+    }
+
+    function sellWeth(uint56 _outAmount) external {
+        approveIfNeeded(swapRouter.weth(), address(swapRouter));
+
+        address[] memory path = new address[](2);
+        path[0] = swapRouter.weth();
+        path[1] = address(revenueToken);
+
+        swapRouter.swapExactTokensForTokens(
+            path,
+            IERC20(swapRouter.weth()).balanceOf(address(this)),
+            _outAmount
+        );
     }
 
 }

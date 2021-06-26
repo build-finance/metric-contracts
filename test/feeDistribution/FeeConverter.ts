@@ -9,7 +9,7 @@ import {
     FeeConverter__factory,
     IERC20,
     RevenueShare,
-    RevenueShare__factory,
+    RevenueShare__factory, RevenueShareVault, RevenueShareVault__factory,
     UniswapV2SwapRouter,
     UniswapV2SwapRouter__factory
 } from "../../typechain";
@@ -20,6 +20,7 @@ describe("FeeConverter contract", function () {
 
     let UNISWAP_ROUTER_ADDRESS = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
     let METRIC_TOKEN = "0xefc1c73a3d8728dc4cf2a18ac5705fe93e5914ac";
+    let METRIC_ETH_UNI_V2_LP_TOKEN = "0xa7d707118c02dCd2beA94Ff05664DB51363c47BD";
 
     let METRIC_FEE_RECIPIENT_ADDRESS = "0x52427b0035f494a21a0a4a1abe04d679f789c821";
     let BUILD_TOKEN = "0x6e36556b3ee5aa28def2a8ec3dae30ec2b208739";
@@ -37,7 +38,9 @@ describe("FeeConverter contract", function () {
 
     let metricShareFactory: RevenueShare__factory;
     let metricShare: RevenueShare;
-    let metricSharePool2: RevenueShare;
+
+    let metricShareVaultFactory: RevenueShareVault__factory;
+    let metricShareVault: RevenueShareVault;
 
     let owner: SignerWithAddress;
     let user: SignerWithAddress;
@@ -51,12 +54,20 @@ describe("FeeConverter contract", function () {
         uniswapV2SwapRouterFactory =
             <UniswapV2SwapRouter__factory>await ethers.getContractFactory("UniswapV2SwapRouter");
         metricShareFactory = <RevenueShare__factory>await ethers.getContractFactory("RevenueShare");
+        metricShareVaultFactory = <RevenueShareVault__factory>await ethers.getContractFactory("RevenueShareVault");
         controllerFactory = <Controller__factory>await ethers.getContractFactory("Controller");
         feeConverterFactory = <FeeConverter__factory>await ethers.getContractFactory("FeeConverter");
 
         uniswapV2SwapRouter = await uniswapV2SwapRouterFactory.deploy(UNISWAP_ROUTER_ADDRESS);
         metricShare = await metricShareFactory.deploy(METRIC_TOKEN, "Metric Revenue Share", "rsMETRIC");
-        metricSharePool2 = await metricShareFactory.deploy(METRIC_TOKEN, "Metric Revenue Share pool 2", "rs2METRIC");
+
+        metricShareVault = await metricShareVaultFactory.deploy(
+            METRIC_ETH_UNI_V2_LP_TOKEN,
+            METRIC_TOKEN,
+            "Metric Revenue Share Vault",
+            "xUNI-v2",
+            uniswapV2SwapRouter.address
+        );
 
         controller =
             await controllerFactory.deploy(
@@ -64,7 +75,7 @@ describe("FeeConverter contract", function () {
                     receiver: metricShare.address,
                     share: BigNumber.from("40000000000000000000")
                 }, {
-                    receiver: metricSharePool2.address,
+                    receiver: metricShareVault.address,
                     share: BigNumber.from("60000000000000000000")
                 }],
                 uniswapV2SwapRouter.address,
@@ -137,7 +148,7 @@ describe("FeeConverter contract", function () {
             await feeConverter.connect(user).transferRewardTokenToReceivers();
 
             expect(await metric.balanceOf(metricShare.address)).to.be.equal(ethers.utils.parseEther("40"));
-            expect(await metric.balanceOf(metricSharePool2.address)).to.be.equal(ethers.utils.parseEther("60"));
+            expect(await metric.balanceOf(metricShareVault.address)).to.be.equal(ethers.utils.parseEther("60"));
 
 
         });
@@ -200,23 +211,41 @@ describe("FeeConverter contract", function () {
 
             let dpiToken: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", DPI_TOKEN));
             let metric: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", METRIC_TOKEN));
+            let metricLp: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", METRIC_ETH_UNI_V2_LP_TOKEN));
+            let weth: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", WETH_TOKEN));
             await dpiToken.connect(metricFeeRecipient).transfer(feeConverter.address, ethers.utils.parseEther("1.0"))
 
             await feeConverter.connect(user).multicall(
                 [
-                    feeConverter.interface.encodeFunctionData("wrapETH"),
-                    feeConverter.interface.encodeFunctionData("convertToken", [
-                        [DPI_TOKEN, WETH_TOKEN, METRIC_TOKEN],
-                        ethers.utils.parseEther("1.0"),
-                        BigNumber.from(0),
-                        user.address
-                    ]),
-                    feeConverter.interface.encodeFunctionData("transferRewardTokenToReceivers")
+                    {
+                        target: feeConverter.address,
+                        data: feeConverter.interface.encodeFunctionData("wrapETH")
+                    },
+                    {
+                        target: feeConverter.address,
+                        data: feeConverter.interface.encodeFunctionData("convertToken",
+                        [
+                                [DPI_TOKEN, WETH_TOKEN, METRIC_TOKEN],
+                            ethers.utils.parseEther("1.0"),
+                            BigNumber.from(0),
+                            user.address
+                            ]
+                        )
+                    },
+                    {
+                        target: feeConverter.address,
+                        data: feeConverter.interface.encodeFunctionData("transferRewardTokenToReceivers")
+                    },
+                    {
+                        target: metricShareVault.address,
+                        data: metricShareVault.interface.encodeFunctionData("compound")
+                    }
                 ]
             );
 
             expect(await metric.balanceOf(metricShare.address)).to.be.equal(ethers.utils.parseEther("63.721694000939713731"));
-            expect(await metric.balanceOf(metricSharePool2.address)).to.be.equal(ethers.utils.parseEther("95.582541001409570598"));
+            expect(await metricLp.balanceOf(metricShareVault.address)).to.be.equal(ethers.utils.parseEther("0.750737005443868714"));
+            expect(await weth.balanceOf(metricShareVault.address)).to.be.equal(ethers.utils.parseEther("0.000426167770419691"));
         })
     });
 

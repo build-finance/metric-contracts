@@ -3,12 +3,12 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IWETH.sol";
 
 import "../governance/Controller.sol";
 import "../governance/Controllable.sol";
 import "../libraries/AllowanceChecker.sol";
+import "../libraries/ExternalMulticall.sol";
 
 /**
  * FeeConverter is designed to receive any token accrued from
@@ -26,7 +26,7 @@ import "../libraries/AllowanceChecker.sol";
  *
  * all action can be paused as well by the Controller.
  */
-contract FeeConverter is Multicall, Controllable, AllowanceChecker {
+contract FeeConverter is ExternalMulticall, Controllable, AllowanceChecker {
 
     event FeeDistribution(
         address recipient,

@@ -66,12 +66,13 @@ describe("RevenueShareVault contract", function () {
             let metricLp: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", METRIC_ETH_UNI_V2_LP_TOKEN));
             let metric: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", METRIC_TOKEN));
             let weth: IERC20 = <IERC20>(await ethers.getContractAt("IERC20", WETH_TOKEN));
-            await metric.connect(metricFeeRecipient).transfer(RevenueShareVault.address, ethers.utils.parseEther("10"));
+            await metric.connect(metricFeeRecipient).transfer(RevenueShareVault.address, ethers.utils.parseEther("100"));
 
             await RevenueShareVault.compound();
+            await RevenueShareVault.sellWeth(0);
 
-            expect(await metricLp.balanceOf(RevenueShareVault.address)).to.be.equal(ethers.utils.parseEther("0.079309268623665039"));
-            expect(await metric.balanceOf(RevenueShareVault.address)).to.be.equal(ethers.utils.parseEther("0.008329361038839100"));
+            expect(await metricLp.balanceOf(RevenueShareVault.address)).to.be.equal(ethers.utils.parseEther("0.775317124237148608"));
+            expect(await metric.balanceOf(RevenueShareVault.address)).to.be.equal(ethers.utils.parseEther("0.498861039583929105"));
             expect(await weth.balanceOf(RevenueShareVault.address)).to.be.equal(0);
 
             expect(await metric.balanceOf(uniswapV2SwapRouter.address)).to.be.equal(0);
